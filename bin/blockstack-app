@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+"""
+    Blockstack-app
+    ~~~~~
+    copyright: (c) 2014-2015 by Halfmoon Labs, Inc.
+    copyright: (c) 2016 by Blockstack.org
+
+    This file is part of Blockstack-app.
+
+    Blockstack-app is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Blockstack-app is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with Blockstack-app. If not, see <http://www.gnu.org/licenses/>.
+"""
+
+import sys
+import blockstack_app
+
+from blockstack_app.version import __version__
+from blockstack_app.config import APP_CONFIG_PATH, PORT, get_config
+
+import SimpleHTTPServer
+import SocketServer
+
+
+if __name__ == "__main__":
+
+    config_path = APP_CONFIG_PATH
+    blockchain_id = None
+    hostname = None
+    port = None
+    function = None
+    args = sys.argv[1:]
+    usage = "Usage: %s [-c|--config CONFIG] [-b|--blockchain_id BLOCKCHAIN_ID] [-H|--hostname HOSTNAME] [-P|--port PORT] function args" % sys.argv[0]
+
+    while True:
+        arg = args.pop(0)
+        
+        if arg in ['-c', '--config']:
+            config_path = args.pop(0)
+
+        elif arg in ['-b', '--blockchain_id']:
+            blockchain_id = args.pop(0)
+
+        elif arg in ['-H', '--hostname']:
+            hostname = args.pop(0)
+
+        elif arg in ['-P', '--port']:
+            try:
+                port = int(args.pop(0))
+            except:
+                print >> sys.stderr, usage
+                sys.exit(1)
+
+        elif arg in ['-h', '--help']:
+            print >> sys.stderr, usage
+            sys.exit(0)
+
+        else:
+            args.insert(0, arg)
+            break
+
+    config = get_config(config_path)
+    if blockchain_id is not None:
+        config['blockchain_id'] = blockchain_id
+    
+    if hostname is not None:
+        config['hostname'] = hostname
+
+    if port is not None:
+        config['port'] = port
+
+    try:
+        function = args.pop(0)
+    except:
+        print >> sys.stderr, usage
+        sys.exit(1)
+
+    blockstack_app.main( config, function, args )
