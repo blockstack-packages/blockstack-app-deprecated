@@ -20,7 +20,7 @@ setup(
     include_package_data=True,
     scripts=['bin/blockstack-app'],
     install_requires=[
-        'blockstack-client>=0.0.13',
+        'blockstack-client>=0.0.13.0',
         'blockstack-gpg>=0.0.1.0',
         'blockstack-file>=0.0.1.0'
     ],
